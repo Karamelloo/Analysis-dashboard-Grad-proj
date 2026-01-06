@@ -1,0 +1,9 @@
+FAILED: gemini-1.5-flash [default(v1beta)] - 404 Not Found
+FAILED: models/gemini-1.5-flash [default(v1beta)] - 404 Not Found
+FAILED: gemini-1.5-flash-latest [default(v1beta)] - 404 Not Found
+FAILED: gemini-1.5-flash [v1] - 404 Not Found
+FAILED: gemini-1.5-flash-001 [v1beta] - 404 Not Found
+FAILED: gemini-1.5-flash-002 [v1beta] - 404 Not Found
+FAILED: gemini-1.5-flash-8b [v1beta] - 404 Not Found
+FAILED: gemini-pro [default(v1beta)] - 404 Not Found
+FAILED: gemini-1.5-pro [v1beta] - 404 Not Found
