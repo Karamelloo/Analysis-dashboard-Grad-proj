@@ -13,18 +13,18 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PlaySonic Dashboard | User Analysis",
-  description: "Comprehensive User Analysis Dashboard for PlaySonic, featuring multi-agent data pipelines, demographics, and engagement metrics.",
+  title: "Karam A+ Grad project | User Analysis",
+  description: "Comprehensive User Analysis Dashboard for Karam A+ Grad project, featuring multi-agent data pipelines, demographics, and engagement metrics.",
   openGraph: {
-    title: "PlaySonic User Analysis Dashboard",
-    description: "Insights into 1,000 active PlaySonic users including demographics, engagement, and padel rank distribution.",
+    title: "Karam A+ Grad project User Analysis Dashboard",
+    description: "Insights into active users including demographics, engagement, and padel rank distribution.",
     type: "website",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "PlaySonic User Analysis",
-    description: "Multi-agent data analysis of PlaySonic user base.",
+    title: "Karam A+ Grad project User Analysis",
+    description: "Multi-agent data analysis of user base.",
   }
 };
 

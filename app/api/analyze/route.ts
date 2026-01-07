@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
 
     const formData = await req.formData();
     const file = formData.get('file') as File;
+    const customPrompt = formData.get('customPrompt') as string | null;
 
     if (!file) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
@@ -32,97 +33,156 @@ export async function POST(req: NextRequest) {
     const sheet = workbook.Sheets[sheetName];
     const allData = XLSX.utils.sheet_to_json(sheet);
     
-    // --- Perform Deterministic Aggregation on Full Dataset ---
-    let totalMales = 0;
-    let totalFemales = 0;
-    const headers = Object.keys(allData[0] || {});
-    const genderKey = headers.find(h => /gender|sex/i.test(h)); // Auto-detect column
-
-    if (genderKey) {
-      allData.forEach((row: any) => {
-        const val = String(row[genderKey] || '').toLowerCase().trim();
-        if (val.startsWith('m')) totalMales++;
-        else if (val.startsWith('f') || val.startsWith('w')) totalFemales++;
-      });
-    }
-    
-    // Fallback if no specific column found (AI will rely on sample, but we inform it)
-    const realStats = {
-      total: allData.length,
-      gender: { Male: totalMales, Female: totalFemales },
-    };
-    // ---------------------------------------------------------
-
-    const promptData = allData.slice(0, 50); // Send first 50 rows to AI (Safe limit)
+    // Send a sample of data to the AI (ensure it's enough to infer context)
+    // Reduce sample size to 15 to save tokens and avoid rate limits
+    const promptData = allData.slice(0, 15); 
     const dataString = JSON.stringify(promptData);
 
-    // 2. Prepare Prompt
-    const prompt = `
-      You are a data analyst. Analyze the following dataset and generate a comprehensive dashboard report in strictly valid JSON format.
-      
-      IMPORTANT: I have calculated the REAL statistics for the FULL dataset (${allData.length} rows). You MUST use these for the charts/metrics where applicable, rather than counting the sample rows.
-      
-      REAL_STATS (Global Truths):
-      - Total Records: ${realStats.total}
-      - Gender Split: Male: ${realStats.gender.Male}, Female: ${realStats.gender.Female} (Use these EXACT values for genderSplit chart)
+    // 2. Prepare Detailed Prompt
+    // 2. Prepare Detailed Prompt
+    const isAdditive = customPrompt?.includes('(ADDITIVE REQUEST)');
+    
+    let objectivesSection = '';
+    if (isAdditive) {
+       objectivesSection = `
+       OBJECTIVES (REFIMEMENT MODE - STRICT):
+       1. **EXECUTE USER REQUEST ONLY**: You are updating an existing dashboard. You must ONLY generate what the user specifically asked for.
+       2. **REMOVALS & REPLACEMENTS**: 
+          - If the user asks to **REMOVE** an item, add its exact Title/Label to the "removals" list.
+          - If the user asks to **REPLACE** an item (e.g., "Change Gender Bar Chart to Pie Chart"), add the OLD item's Title to "removals" and generate the NEW item in "dynamicCharts".
+       3. **ZERO UNREQUESTED CONTENT**: 
+          - Did the user ask for Metrics? If NO -> Return "keyMetrics": []
+          - Did the user ask for Charts? If NO -> Return "dynamicCharts": []
+          - Did the user ask for Insights? If NO -> Return "keyInsights": []
+          - Did the user ask for Recommendations? If NO -> Return "recommendations": []
+       4. **PRESERVE CONTEXT**: Use the provided sample data to generate the *requested* items accurately.
+       `;
+    } else {
+       objectivesSection = `
+       OBJECTIVES:
+       1. **Infer Domain**: Figure out what this data represents.
+       2. **Key Metrics**: Calculate 4 vital high-level metrics.
+       3. **Dynamic Visualization**: Design 4-6 charts.
+          - **VERIFY**: Check the keys. Do you see "Date", "Year", "Time", "Month"? 
+          - **YES**: Use Line/Area charts for trends.
+          - **NO**: DO NOT USE LINE/AREA CHARTS. Use Bar (distribution), Pie (composition), or Scatter (relationship).
+       4. **Deep Strategic Insights**: Provide 5-6 comprehensive insights.
+          - Contextualize "Why this matters".
+       5. **Actionable Recommendations**: Suggest 5-6 concrete actions.
+       `;
+    }
 
-      SAMPLE DATA (First 50 rows for context/trends):
+    let schemaSection = '';
+    if (isAdditive) {
+       schemaSection = `
+       OUTPUT SCHEMA (Strict JSON - ADDITIVE MODE):
+       (Only populate arrays if specifically requested. Otherwise return empty [].)
+       {
+         "analysisTitle": "String (Keep existing)",
+         "analysisDescription": "String (Keep existing)",
+         "keyMetrics": [ /* ADD ONLY IF REQUESTED, else [] */
+           { "label": "String", "value": "String", "description": "String", "icon": "String", "variant": "default" }
+         ],
+         "dynamicCharts": [ /* ADD ONLY IF REQUESTED, else [] */
+           {
+             "id": "String",
+             "title": "String",
+             "description": "String",
+             "chartType": "String",
+             "data": [ { "name": "String", "value": Number, "x": "Number (Optional, for Scatter)", "y": "Number (Optional, for Scatter)" } ] 
+           }
+         ],
+         "keyInsights": [ /* ADD ONLY IF REQUESTED, else [] */
+           { "title": "String", "severity": "String", "description": "String" }
+         ],
+         "recommendations": [ /* ADD ONLY IF REQUESTED, else [] */
+            { "title": "String", "action": "String", "impact": "String" }
+         ],
+         "removals": [
+           { "type": "String (metric, chart, insight, recommendation)", "title": "String" }
+         ]
+       }`;
+    } else {
+       schemaSection = `
+       OUTPUT SCHEMA (Strict JSON - FULL ANALYSIS):
+       {
+         "analysisTitle": "String (Professional, Non-Redundant)",
+         "analysisDescription": "String (Executive Summary)",
+         "keyMetrics": [
+           { "label": "String", "value": "String", "description": "String", "icon": "String (One of: Users, TrendingUp, DollarSign, Activity, BarChart, PieChart, AlertCircle, CheckCircle, Zap, Target)", "variant": "default" }
+         ],
+         "dynamicCharts": [
+           {
+             "id": "String (unique)",
+             "title": "String",
+             "description": "String",
+             "chartType": "String (One of: 'bar', 'pie', 'line', 'area', 'scatter')",
+             "data": [ { "name": "String", "value": "Number", "x": "Number (Optional, for Scatter)", "y": "Number (Optional, for Scatter)" } ] 
+           }
+         ],
+         "keyInsights": [
+           { "title": "String", "severity": "String (positive, warning, info)", "description": "String (Include 'Why this matters')" }
+         ],
+         "recommendations": [
+           { "title": "String", "action": "String", "impact": "String (high, medium, low)" }
+         ],
+         "removals": []
+       }`;
+    }
+
+    const prompt = `
+      You are a Senior Strategic Consultant.
+      Your goal is to analyze the provided dataset SAMPLE **accurately**, based ONLY on the data fields present.
+      
+      ${customPrompt ? `\nUSER SPECIAL INSTRUCTIONS: ${customPrompt}\n(IMPORTANT: Prioritize these instructions over default behavior.)\n` : ''}
+
+      DATASET CONTEXT:
+      - Total Records: ${allData.length}
+      - Columns/Keys: ${Object.keys(promptData[0] || {}).join(", ")} <--- ONLY USE THESE FIELDS.
+      
+      SAMPLE DATA (First 15 rows):
       ${dataString}
 
-      OUTPUT SCHEMA (TypeScript Interface):
-      interface ChartDataPoint { name: string; value: number; }
-      interface DashboardData {
-        keyMetrics: { label: string; value: string; description: string; icon: string; variant?: 'default' | 'accent'; delay?: number; }[];
-        additionalMetrics: { title: string; value: string; sub: string; className: string; }[];
-        
-        demographics: { 
-          ageDistribution: ChartDataPoint[]; 
-          genderSplit: ChartDataPoint[]; 
-        };
-        engagement: { 
-          activityTime: ChartDataPoint[]; // Hour of day (0-24) vs Activity count
-          padelRank: ChartDataPoint[]; 
-        };
-        location: { 
-          topRegions: ChartDataPoint[]; 
-        };
-        
-        keyFindings: { title: string; desc: string; }[];
-        marketing: {
-          targetAudience: { label: string; text: string }[];
-          recommendations: { label: string; text: string }[];
-          strategies: { icon: string; title: string; desc: string; from: string; to: string }[];
-          roi: { value: string; label: string; color: string }[];
-        };
-        dataQuality: { metric: string; result: string; status: string; }[];
-      }
+      CRITICAL RULES (STRICT ADHERENCE REQUIRED):
+      1. **NO HALLUCINATIONS**: Do NOT invent columns. If there is no 'Date' or 'Time' column in the keys below, YOU MUST NOT create Line or Area charts. Use Bar charts for categories or Scatter plots for correlations instead. THIS IS A HARD RULE.
+      2. **TITLE QUALITY**: Generate a clean, professional title. Do NOT repeat words.
+      3. **DATA GROUNDING**: Every metric and chart MUST be derivable from the provided sample keys.
+      4. **ADDITIVE REQUESTS**: If this is an additive request, DO NOT re-generate standard analysis sections unless explicitly asked.
 
-      INSTRUCTIONS:
-      1. Analyze the sample data to calculate accurate metrics. Scale totals if necessary or use rates/averages.
-      2. For 'keyMetrics', use icons: 'Users', 'TrendingUp', 'Trophy', 'MapPin'.
-      3. For 'additionalMetrics', use gradient classNames.
-      4. For Charts:
-         - 'ageDistribution': Buckets like "18-24", "25-34", etc.
-         - 'genderSplit': "Male", "Female", etc.
-         - 'activityTime': "18:00", "19:00" etc mapping to activity volume.
-         - 'padelRank': Levels like "1.0", "1.5", ... "5.0".
-         - 'topRegions': Top 5 cities or regions.
-         - Ensure 'value' is a number.
-      5. Return ONLY the JSON object. No markdown formatting.
+      ${objectivesSection}
+
+      ${schemaSection}
     `;
 
-    // 3. Generate Content using Groq
-    const chatCompletion = await groq.chat.completions.create({
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-      model: "llama-3.3-70b-versatile",
-      temperature: 0.1, // Low temperature for consistent JSON
-      response_format: { type: "json_object" }, // Enforce JSON response if model supports it (Llama 3 usually does)
-    });
+    // 3. Generate Content using Groq with Fallback
+    let chatCompletion;
+    try {
+        // Try Primary Model (Smartest)
+        chatCompletion = await groq.chat.completions.create({
+          messages: [{ role: "user", content: prompt }],
+          model: "llama-3.3-70b-versatile",
+          temperature: 0.2,
+          max_tokens: 4000,
+          response_format: { type: "json_object" },
+        });
+    } catch (primaryError: any) {
+        console.warn("Primary model failed, attempting fallback...", primaryError.message);
+        
+        // Check for Rate Limit specifically or just try fallback generally
+        // Try Fallback Model (Faster/Cheaper)
+        try {
+            chatCompletion = await groq.chat.completions.create({
+              messages: [{ role: "user", content: prompt }],
+              model: "llama-3.1-8b-instant",
+              temperature: 0.2,
+              max_tokens: 4000,
+              response_format: { type: "json_object" },
+            });
+        } catch (fallbackError: any) {
+            // If both fail, throw the original or a combined error
+            throw new Error(`AI Service Unavailable. Primary: ${primaryError.message}. Fallback: ${fallbackError.message}`);
+        }
+    }
 
     const text = chatCompletion.choices[0]?.message?.content || '{}';
 
@@ -130,7 +190,6 @@ export async function POST(req: NextRequest) {
     let dashboardData: DashboardData;
     let jsonString = text.trim();
     
-    // Remove Markdown code blocks if present (Groq/Llama might still add them)
     jsonString = jsonString.replace(/```json/g, '').replace(/```/g, '').trim();
 
     try {

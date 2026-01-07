@@ -2,64 +2,51 @@ export interface Metric {
   label: string;
   value: string;
   description: string;
-  icon: string; // We'll store icon name as string and map it in component
+  icon: string;
   variant?: 'default' | 'accent';
   delay?: number;
+  isNew?: boolean;
 }
 
-export interface ChartDataPoint {
-  name: string;
-  value: number;
-  color?: string;
-}
-
-export interface AdditionalMetric {
+export interface DynamicChart {
+  id: string;
   title: string;
-  value: string;
-  sub: string;
-  className: string;
+  description: string;
+  chartType: 'bar' | 'pie' | 'line' | 'area' | 'scatter';
+  data: { name: string; value: number }[];
+  config?: { xKey: string; yKey: string; color?: string };
+  isNew?: boolean;
 }
 
-export interface Finding {
+export interface GenericInsight {
   title: string;
-  desc: string;
+  severity: 'info' | 'warning' | 'positive';
+  description: string;
+  isNew?: boolean;
 }
 
-export interface MarketingData {
-  targetAudience: { label: string; text: string }[];
-  recommendations: { label: string; text: string }[];
-  strategies: { icon: string; title: string; desc: string; from: string; to: string }[];
-  roi: { value: string; label: string; color: string }[];
-}
-
-export interface KeyFinding extends Finding {} // Alias if needed, or just use Finding
-
-export interface DataQualityRow {
-  metric: string;
-  result: string;
-  status: string;
+export interface Recommendation {
+  title: string;
+  action: string;
+  impact?: 'high' | 'medium' | 'low';
+  isNew?: boolean;
 }
 
 export interface DashboardData {
+  analysisTitle: string;
+  analysisDescription: string;
+  
   keyMetrics: Metric[];
-  additionalMetrics: AdditionalMetric[];
   
-  // Charts Data
-  demographics: {
-    ageDistribution: ChartDataPoint[];
-    genderSplit: ChartDataPoint[];
-  };
+  dynamicCharts: DynamicChart[];
   
-  engagement: {
-    activityTime: ChartDataPoint[];
-    padelRank: ChartDataPoint[];
-  };
-  
-  location: {
-    topRegions: ChartDataPoint[];
-  };
-  keyFindings: Finding[];
-  marketing: MarketingData;
-  dataQuality: DataQualityRow[];
+  keyInsights: GenericInsight[];
+  recommendations: Recommendation[];
+  removals?: {
+    type: 'metric' | 'chart' | 'insight' | 'recommendation';
+    id?: string;
+    title?: string;
+  }[];
+  isNew?: boolean;
   recordCount?: number;
 }

@@ -13,7 +13,7 @@ export function HeroSection() {
           User Insights & Analytics
         </h2>
         <p className="text-base md:text-lg text-gray-600 leading-relaxed">
-          This dashboard presents the results of a comprehensive multi-agent data analysis pipeline applied to PlaySonic user data.
+          This dashboard presents the results of a comprehensive multi-agent data analysis pipeline applied to your uploaded data.
         </p>
       </div>
     </motion.section>

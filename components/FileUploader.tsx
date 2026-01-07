@@ -8,13 +8,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 // OR I can write a simple custom drag-drop handler. Custom is better to avoid deps if possible.
 
 interface FileUploaderProps {
-  onUpload: (file: File) => void;
+  onUpload: (file: File, prompt?: string) => void;
   isAnalyzing: boolean;
 }
 
 export function FileUploader({ onUpload, isAnalyzing }: FileUploaderProps) {
   const [dragActive, setDragActive] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const [prompt, setPrompt] = useState('');
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -44,7 +45,7 @@ export function FileUploader({ onUpload, isAnalyzing }: FileUploaderProps) {
 
   const handleUploadClick = () => {
     if (file) {
-      onUpload(file);
+      onUpload(file, prompt);
     }
   };
 
@@ -56,18 +57,18 @@ export function FileUploader({ onUpload, isAnalyzing }: FileUploaderProps) {
         className="w-full max-w-xl bg-white rounded-2xl shadow-xl border border-gray-100 p-8 text-center"
       >
         <div className="mb-6">
-          <div className="w-16 h-16 bg-teal-50 text-teal-600 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <FileSpreadsheet size={32} />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Upload User Data</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2 tracking-tight">Upload Data</h2>
           <p className="text-gray-500">
-            Upload your Excel (.xlsx) file to generate an AI-powered analysis dashboard.
+            Upload your Excel (.xlsx) or CSV file to generate an AI-powered analysis dashboard.
           </p>
         </div>
 
         <div
           className={`relative border-2 border-dashed rounded-xl p-8 transition-colors ${
-            dragActive ? "border-teal-500 bg-teal-50/50" : "border-gray-200 hover:border-teal-400 hover:bg-gray-50"
+            dragActive ? "border-blue-500 bg-blue-50/50" : "border-gray-200 hover:border-blue-400 hover:bg-gray-50"
           }`}
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
@@ -81,7 +82,7 @@ export function FileUploader({ onUpload, isAnalyzing }: FileUploaderProps) {
                    key="file"
                    initial={{ opacity: 0, y: 10 }}
                    animate={{ opacity: 1, y: 0 }}
-                   className="flex items-center gap-2 text-teal-600 font-medium"
+                   className="flex items-center gap-2 text-blue-600 font-medium"
                  >
                    <CheckCircle size={20} />
                    <span>{file.name}</span>
@@ -95,7 +96,7 @@ export function FileUploader({ onUpload, isAnalyzing }: FileUploaderProps) {
                  >
                    <Upload size={24} className="text-gray-400" />
                    <p className="text-sm text-gray-500">
-                     Drag & drop or <span className="text-teal-600 font-medium">click to browse</span>
+                     Drag & drop or <span className="text-blue-600 font-medium">click to browse</span>
                    </p>
                  </motion.div>
                )}
@@ -110,14 +111,30 @@ export function FileUploader({ onUpload, isAnalyzing }: FileUploaderProps) {
             disabled={isAnalyzing}
           />
         </div>
+        
+        {/* Custom Prompt Input */}
+        <div className="mt-6 text-left">
+          <label htmlFor="custom-prompt" className="block text-sm font-medium text-gray-700 mb-2">
+             Optional: Instructions for AI
+          </label>
+          <textarea
+            id="custom-prompt"
+            rows={3}
+            className="w-full rounded-xl border-gray-200 focus:border-blue-500 focus:ring-blue-500 p-3 text-sm resize-none border text-black"
+            placeholder="e.g., Focus on profit margins, Analyze this as a healthcare dataset..."
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            disabled={isAnalyzing}
+          />
+        </div>
 
         <button
           onClick={handleUploadClick}
           disabled={!file || isAnalyzing}
-          className={`mt-6 w-full py-3 px-4 rounded-xl font-bold text-white transition-all flex items-center justify-center gap-2 ${
+          className={`mt-6 w-full py-3 px-4 rounded-full font-bold text-white transition-all flex items-center justify-center gap-2 ${
             !file || isAnalyzing
               ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-              : "bg-gradient-to-r from-teal-500 to-cyan-600 hover:shadow-lg hover:shadow-teal-500/20 active:scale-[0.98]"
+              : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:shadow-lg hover:shadow-blue-500/20 active:scale-[0.98]"
           }`}
         >
           {isAnalyzing ? (
