@@ -49,12 +49,13 @@ export async function POST(req: NextRequest) {
        1. **EXECUTE USER REQUEST ONLY**: You are updating an existing dashboard. You must ONLY generate what the user specifically asked for.
        2. **REMOVALS & REPLACEMENTS**: 
           - If the user asks to **REMOVE** an item, add its exact Title/Label to the "removals" list.
-          - If the user asks to **REPLACE** an item (e.g., "Change Gender Bar Chart to Pie Chart"), add the OLD item's Title to "removals" and generate the NEW item in "dynamicCharts".
+          - If the user asks to **REPLACE** an item, add the OLD item's Title to "removals" and generate the NEW item.
        3. **ZERO UNREQUESTED CONTENT**: 
-          - Did the user ask for Metrics? If NO -> Return "keyMetrics": []
-          - Did the user ask for Charts? If NO -> Return "dynamicCharts": []
-          - Did the user ask for Insights? If NO -> Return "keyInsights": []
-          - Did the user ask for Recommendations? If NO -> Return "recommendations": []
+          - Metrics? Only if asked.
+          - Charts? Only if asked.
+          - Insights? Only if asked.
+          - Recommendations? Only if asked.
+          - Predictions? Only if asked.
        4. **PRESERVE CONTEXT**: Use the provided sample data to generate the *requested* items accurately.
        `;
     } else {
@@ -62,13 +63,17 @@ export async function POST(req: NextRequest) {
        OBJECTIVES:
        1. **Infer Domain**: Figure out what this data represents.
        2. **Key Metrics**: Calculate 4 vital high-level metrics.
+          - Include 'explanation': Briefly explain HOW this number was calculated (e.g. "Count of unique UserIDs in column A").
        3. **Dynamic Visualization**: Design 4-6 charts.
           - **VERIFY**: Check the keys. Do you see "Date", "Year", "Time", "Month"? 
           - **YES**: Use Line/Area charts for trends.
           - **NO**: DO NOT USE LINE/AREA CHARTS. Use Bar (distribution), Pie (composition), or Scatter (relationship).
        4. **Deep Strategic Insights**: Provide 5-6 comprehensive insights.
           - Contextualize "Why this matters".
-       5. **Actionable Recommendations**: Suggest 5-6 concrete actions.
+       5. **Future Predictions**: Generate 3-4 forward-looking predictions based on the trends.
+          - Suggest "Sales Q4", "Growth Rate", "Risk Probability".
+          - Assign a confidence level (high/medium/low).
+       6. **Actionable Recommendations**: Suggest 5-6 concrete actions.
        `;
     }
 
@@ -98,6 +103,9 @@ export async function POST(req: NextRequest) {
          "recommendations": [ /* ADD ONLY IF REQUESTED, else [] */
             { "title": "String", "action": "String", "impact": "String" }
          ],
+         "predictions": [ /* ADD ONLY IF REQUESTED, else [] */
+            { "title": "String", "predictedValue": "String", "trend": "up|down|stable", "confidence": "high|medium|low", "reasoning": "String" }
+         ],
          "removals": [
            { "type": "String (metric, chart, insight, recommendation)", "title": "String" }
          ]
@@ -109,13 +117,14 @@ export async function POST(req: NextRequest) {
          "analysisTitle": "String (Professional, Non-Redundant)",
          "analysisDescription": "String (Executive Summary)",
          "keyMetrics": [
-           { "label": "String", "value": "String", "description": "String", "icon": "String (One of: Users, TrendingUp, DollarSign, Activity, BarChart, PieChart, AlertCircle, CheckCircle, Zap, Target)", "variant": "default" }
+           { "label": "String", "value": "String", "description": "String", "explanation": "String (Calculation Method)", "icon": "String (One of: Users, TrendingUp, DollarSign, Activity, BarChart, PieChart, AlertCircle, CheckCircle, Zap, Target)", "variant": "default" }
          ],
          "dynamicCharts": [
            {
              "id": "String (unique)",
              "title": "String",
              "description": "String",
+             "explanation": "String (Data Source/Logic)",
              "chartType": "String (One of: 'bar', 'pie', 'line', 'area', 'scatter')",
              "data": [ { "name": "String", "value": "Number", "x": "Number (Optional, for Scatter)", "y": "Number (Optional, for Scatter)" } ] 
            }
@@ -125,6 +134,9 @@ export async function POST(req: NextRequest) {
          ],
          "recommendations": [
            { "title": "String", "action": "String", "impact": "String (high, medium, low)" }
+         ],
+         "predictions": [
+            { "title": "String (e.g. Q4 Sales Forecast)", "predictedValue": "String (e.g. $1.2M)", "trend": "up|down|stable", "confidence": "high|medium|low", "reasoning": "String (Why?)", "explanation": "String (Model/Calculation Method used)" }
          ],
          "removals": []
        }`;

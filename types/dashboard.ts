@@ -6,6 +6,7 @@ export interface Metric {
   variant?: 'default' | 'accent';
   delay?: number;
   isNew?: boolean;
+  explanation?: string;
 }
 
 export interface DynamicChart {
@@ -16,6 +17,7 @@ export interface DynamicChart {
   data: { name: string; value: number }[];
   config?: { xKey: string; yKey: string; color?: string };
   isNew?: boolean;
+  explanation?: string;
 }
 
 export interface GenericInsight {
@@ -32,6 +34,16 @@ export interface Recommendation {
   isNew?: boolean;
 }
 
+export interface Prediction {
+  title: string;
+  predictedValue: string;
+  trend: 'up' | 'down' | 'stable';
+  confidence: 'high' | 'medium' | 'low';
+  reasoning: string;
+  isNew?: boolean;
+  explanation?: string;
+}
+
 export interface DashboardData {
   analysisTitle: string;
   analysisDescription: string;
@@ -42,6 +54,7 @@ export interface DashboardData {
   
   keyInsights: GenericInsight[];
   recommendations: Recommendation[];
+  predictions?: Prediction[];
   removals?: {
     type: 'metric' | 'chart' | 'insight' | 'recommendation';
     id?: string;

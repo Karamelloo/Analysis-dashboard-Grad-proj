@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
+import { Info } from 'lucide-react';
 import {
   BarChart,
   Bar,
@@ -20,7 +21,7 @@ import {
   Scatter,
   Legend,
 } from 'recharts';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { DynamicChart } from '@/types/dashboard';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
@@ -32,7 +33,8 @@ interface Props {
 
 export function DynamicChartRenderer({ chart, isDarkMode = true }: { chart: DynamicChart; isDarkMode?: boolean }) {
   const chartRef = useRef<HTMLDivElement>(null);
-  const { chartType, data, title, description } = chart;
+  const { chartType, data, title, description, explanation } = chart;
+  const [showExplanation, setShowExplanation] = useState(false);
 
   const getAxisStyle = () => ({
       fontSize: 12, 
@@ -197,8 +199,44 @@ export function DynamicChartRenderer({ chart, isDarkMode = true }: { chart: Dyna
                 </span>
               )}
             </h3>
-        <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{description}</p>
-      </div>
+            <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{description}</p>
+         </div>
+
+         <div className="relative">
+             <button
+                onClick={() => explanation && setShowExplanation(!showExplanation)}
+                className={`p-2 rounded-lg transition-colors ${
+                  isDarkMode ? "hover:bg-white/10 text-gray-400 hover:text-white" : "hover:bg-gray-100 text-gray-400 hover:text-gray-600"
+                } ${explanation ? 'cursor-help' : 'cursor-default'}`}
+              >
+                <Info size={18} />
+              </button>
+
+              <AnimatePresence>
+                {showExplanation && explanation && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    className="absolute right-0 top-10 w-64 z-50 p-4 rounded-xl shadow-2xl border border-blue-500/20 bg-[#0f172a]/95 backdrop-blur-xl text-left"
+                  >
+                     <div className="flex items-start gap-2 mb-2">
+                        <Info size={16} className="text-blue-400 mt-0.5" />
+                        <span className="text-xs font-bold text-blue-200 uppercase tracking-wider">AI Insight</span>
+                     </div>
+                     <p className="text-sm text-gray-300 leading-relaxed font-light">
+                        {explanation}
+                     </p>
+                     <button
+                      onClick={() => setShowExplanation(false)}
+                      className="mt-3 text-[10px] text-blue-400 hover:text-white uppercase font-bold tracking-widest w-full text-center"
+                     >
+                       Close
+                     </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+         </div>
       </div>
       <div className="w-full h-[300px]">
         {renderChart()}

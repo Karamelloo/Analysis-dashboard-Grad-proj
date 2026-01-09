@@ -1,5 +1,6 @@
-import React, { ReactNode } from "react";
-import { motion } from 'framer-motion';
+import React, { ReactNode, useState } from "react";
+import { motion, AnimatePresence } from 'framer-motion';
+import { HelpCircle, Info } from 'lucide-react';
 
 interface StatCardProps {
   label: string;
@@ -10,6 +11,7 @@ interface StatCardProps {
   delay?: number;
   isNew?: boolean;
   isDarkMode?: boolean;
+  explanation?: string;
 }
 
 export function StatCard({
@@ -21,8 +23,10 @@ export function StatCard({
   delay = 0,
   isNew,
   isDarkMode = true,
+  explanation,
 }: StatCardProps) {
   const isAccent = variant === "accent";
+  const [showExplanation, setShowExplanation] = useState(false);
 
   return (
     <motion.div
@@ -55,12 +59,40 @@ export function StatCard({
           </p>
           <h3 className="text-2xl font-bold mt-1 tracking-tight">{value}</h3>
         </div>
-        <div
-          className={`p-2 rounded-lg ${
-            isAccent ? "bg-white/20" : isDarkMode ? "bg-white/10 text-blue-400" : "bg-blue-50 text-blue-600"
-          }`}
-        >
-          {icon}
+        <div className="relative">
+          <button
+            onClick={() => explanation && setShowExplanation(!showExplanation)}
+            className={`p-2 rounded-lg transition-colors ${
+              isAccent ? "bg-white/20 hover:bg-white/30" : isDarkMode ? "bg-white/10 text-blue-400 hover:bg-white/20" : "bg-blue-50 text-blue-600 hover:bg-blue-100"
+            } ${explanation ? 'cursor-help' : 'cursor-default'}`}
+          >
+            {icon}
+          </button>
+          
+          <AnimatePresence>
+            {showExplanation && explanation && (
+              <motion.div
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                className="absolute right-0 top-12 w-64 z-50 p-4 rounded-xl shadow-2xl border border-blue-500/20 bg-[#0f172a]/95 backdrop-blur-xl text-left"
+              >
+                 <div className="flex items-start gap-2 mb-2">
+                    <Info size={16} className="text-blue-400 mt-0.5" />
+                    <span className="text-xs font-bold text-blue-200 uppercase tracking-wider">AI Insight</span>
+                 </div>
+                 <p className="text-sm text-gray-300 leading-relaxed font-light">
+                    {explanation}
+                 </p>
+                 <button 
+                  onClick={() => setShowExplanation(false)}
+                  className="mt-3 text-[10px] text-blue-400 hover:text-white uppercase font-bold tracking-widest w-full text-center"
+                 >
+                   Close
+                 </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
       <p

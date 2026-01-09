@@ -6,7 +6,8 @@ import {
   Methodology,
   DynamicAnalysisSection,
   InsightsSection,
-  RecommendationsSection
+  RecommendationsSection,
+  PredictionsSection
 } from '@/components/AnalysisSections';
 import { ScrollToTop } from '@/components/ScrollToTop';
 import { DashboardData } from '@/types/dashboard';
@@ -33,10 +34,10 @@ interface DashboardViewProps {
 
 export function DashboardView({ data, onReset, onRefine, isRefining, isSessionActive, onSessionRestore, showSuccess }: DashboardViewProps) {
   
-  const { keyMetrics, dynamicCharts, keyInsights, recommendations, recordCount, analysisTitle, analysisDescription } = data;
+  const { keyMetrics, dynamicCharts, keyInsights, recommendations, predictions, recordCount, analysisTitle, analysisDescription } = data;
   const dashboardRef = useRef<HTMLDivElement>(null);
   const [showRefineDialog, setShowRefineDialog] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const isDarkMode = true; // Forced Dark Mode
   const [refinePrompt, setRefinePrompt] = useState('');
 
   const handlePrint = () => {
@@ -58,18 +59,24 @@ export function DashboardView({ data, onReset, onRefine, isRefining, isSessionAc
 
   return (
 
-    <div className={`min-h-screen relative flex flex-col font-sans overflow-hidden selection:bg-indigo-500/30 transition-colors duration-500 ${isDarkMode ? 'bg-black text-white' : 'bg-gray-50 text-gray-900'}`} ref={dashboardRef}>
+    <div className={`min-h-screen relative flex flex-col font-sans overflow-hidden transition-colors duration-500 ${isDarkMode ? 'bg-[#050505] text-white selection:bg-blue-500/30' : 'bg-slate-50 text-slate-900 selection:bg-blue-200/50'}`} ref={dashboardRef}>
       
-      {/* Backgrounds */}
+      {/* Dynamic Aurora Background (Matching Hero) */}
       {isDarkMode ? (
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          <div className="absolute top-[-20%] left-[-10%] w-[800px] h-[800px] bg-purple-900/40 rounded-full mix-blend-screen filter blur-[120px] opacity-40 animate-blob"></div>
-          <div className="absolute top-[20%] right-[-20%] w-[600px] h-[600px] bg-blue-900/40 rounded-full mix-blend-screen filter blur-[120px] opacity-40 animate-blob animation-delay-2000"></div>
-          <div className="absolute bottom-[-10%] left-[20%] w-[600px] h-[600px] bg-indigo-900/40 rounded-full mix-blend-screen filter blur-[120px] opacity-40 animate-blob animation-delay-4000"></div>
-          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.03] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
+        <div className="absolute inset-0 z-0 bg-[#050505]">
+           {/* Aurora Beams */}
+           <div className="absolute top-[-20%] left-[-10%] w-[800px] h-[600px] bg-emerald-900/10 rounded-full blur-[100px] animate-pulse"></div>
+           <div className="absolute top-[10%] right-[-10%] w-[600px] h-[600px] bg-blue-900/20 rounded-full blur-[120px] animate-blob animation-delay-4000"></div>
+           <div className="absolute bottom-[-20%] left-[20%] w-[800px] h-[500px] bg-slate-800/20 rounded-full blur-[100px] animate-blob animation-delay-2000"></div>
+           
+           {/* Subtle Grain Overlay */}
+           <div className="absolute inset-0 bg-[url('/noise.svg')] opacity-[0.05]"></div>
         </div>
       ) : (
-         <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-br from-indigo-50/50 via-white to-blue-50/50"></div>
+         <div className="absolute inset-0 z-0 pointer-events-none">
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-50"></div>
+            <div className="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-blue-50 to-transparent"></div>
+         </div>
       )}
 
        {/* Success Overlay Animation */}
@@ -157,23 +164,21 @@ export function DashboardView({ data, onReset, onRefine, isRefining, isSessionAc
 
       {/* Header */}
 
-      <div className={`sticky top-0 z-50 backdrop-blur-xl border-b px-4 py-3 flex justify-between items-center shadow-sm transition-colors duration-500 ${isDarkMode ? 'bg-black/60 border-white/5' : 'bg-white/80 border-gray-200'}`} data-html2canvas-ignore>
-        <div className="flex items-center gap-2">
-           <BarChart3 className="text-blue-500 w-6 h-6" />
-           <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent tracking-tight">
-             {analysisTitle || 'Karam A+ Grad project Analytics'}
-           </h1>
+      <div className={`sticky top-0 z-50 border-b px-6 py-4 flex justify-between items-center shadow-lg transition-colors duration-500 ${isDarkMode ? 'bg-[#050505]/80 border-white/5 backdrop-blur-md' : 'bg-white/90 border-slate-200 backdrop-blur-md'}`} data-html2canvas-ignore>
+        <div className="flex items-center gap-3">
+           <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-blue-600' : 'bg-blue-600'} text-white`}>
+             <BarChart3 className="w-5 h-5" />
+           </div>
+           <div>
+             <h1 className={`text-lg font-bold leading-none ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+               Karam A+ Project
+             </h1>
+             <p className={`text-[10px] uppercase tracking-wider font-semibold ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>Analysis Dashboard</p>
+           </div>
         </div>
         
         <div className="flex gap-3 items-center">
-          <Button
-            onClick={() => setIsDarkMode(!isDarkMode)}
-            variant="outline"
-            className={`flex items-center gap-2 border shadow-sm transition-all hover:scale-105 ${isDarkMode ? 'border-yellow-500/50 bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20' : 'border-indigo-600/30 bg-indigo-50 text-indigo-600 hover:bg-indigo-100'}`}
-          >
-            {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
-            <span className="font-bold hidden md:inline">{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
-          </Button>
+          {/* Theme Toggle Removed - Forced Dark Mode */}
 
           <Button 
             onClick={handlePrint}
@@ -181,7 +186,7 @@ export function DashboardView({ data, onReset, onRefine, isRefining, isSessionAc
             className={`flex items-center gap-2 transition-colors ${isDarkMode ? 'border-white/10 bg-white/5 text-gray-200 hover:bg-white/10 hover:text-white' : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'}`}
           >
              <Download className="w-4 h-4" />
-             <span className="hidden md:inline">Save PDF</span>
+             <span className="hidden md:inline">Save dashboard as PDF</span>
           </Button>
           <Button 
             onClick={onReset}
@@ -189,24 +194,30 @@ export function DashboardView({ data, onReset, onRefine, isRefining, isSessionAc
             className={`flex items-center gap-2 transition-colors ${isDarkMode ? 'border-white/10 bg-white/5 text-gray-200 hover:bg-white/10 hover:text-white' : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'}`}
           >
             <RefreshCcw size={16} />
-            <span className="hidden md:inline">New Analysis</span>
+            <span className="hidden md:inline">Upload New Data</span>
           </Button>
         </div>
       </div>
 
       <main className="relative z-10 container mx-auto px-4 py-8 md:py-12">
         {/* Dynamic Hero Section */}
-        <section className="mb-12 text-center">
-            <h2 className={`text-4xl md:text-5xl font-black mb-6 drop-shadow-2xl ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{analysisTitle}</h2>
-            <p className={`text-xl max-w-2xl mx-auto font-light leading-relaxed ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{analysisDescription}</p>
+        <section className={`mb-12 text-center py-10 rounded-3xl relative overflow-hidden`}>
+             {/* Decorative backing for hero */}
+             <div className={`absolute inset-0 opacity-10 ${isDarkMode ? 'bg-gradient-to-r from-blue-500 to-emerald-600' : 'bg-gradient-to-r from-blue-600 to-indigo-600'}`}></div>
+             
+            <h2 className={`text-3xl md:text-5xl font-bold mb-4 relative z-10 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{analysisTitle}</h2>
+            <p className={`text-lg max-w-3xl mx-auto font-light leading-relaxed relative z-10 ${isDarkMode ? 'text-blue-100' : 'text-slate-600'}`}>{analysisDescription}</p>
         </section>
         
         {/* Key Metrics */}
         <section className="mb-12 md:mb-16">
-          <h3 className={`text-xl md:text-2xl font-bold mb-6 md:mb-8 flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-             <span className="w-1 h-8 bg-blue-500 rounded-full block"></span>
-             Key Metrics
-          </h3>
+          <div className="flex items-center gap-4 mb-8">
+             <div className={`h-px flex-1 ${isDarkMode ? 'bg-white/10' : 'bg-slate-200'}`}></div>
+             <h3 className={`text-lg font-bold uppercase tracking-widest ${isDarkMode ? 'text-blue-400' : 'text-blue-700'}`}>
+                Key Performance Indicators
+             </h3>
+             <div className={`h-px flex-1 ${isDarkMode ? 'bg-white/10' : 'bg-slate-200'}`}></div>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {keyMetrics.map((metric, index) => {
               const IconComponent = IconMap[metric.icon] || BarChart3;
@@ -235,6 +246,8 @@ export function DashboardView({ data, onReset, onRefine, isRefining, isSessionAc
         <DynamicAnalysisSection charts={dynamicCharts} isDarkMode={isDarkMode} />
 
         <RecommendationsSection recommendations={recommendations} isDarkMode={isDarkMode} />
+
+        <PredictionsSection predictions={predictions} isDarkMode={isDarkMode} />
         
         <PageFooter />
       </main>
@@ -242,21 +255,37 @@ export function DashboardView({ data, onReset, onRefine, isRefining, isSessionAc
       {/* Scroll To Top */}
       <ScrollToTop />
 
-      {/* Bottom Floating Refine Bar */}
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 animate-in slide-in-from-bottom-10 fade-in duration-700 delay-1000">
-        <div className={`${isDarkMode ? 'bg-black/40 border-white/10 shadow-blue-500/10 hover:bg-black/60' : 'bg-white/80 border-blue-200 shadow-blue-900/5 hover:bg-white'} backdrop-blur-2xl border shadow-2xl rounded-full p-2 pl-6 pr-2 flex items-center gap-4 transition-all hover:scale-105`}>
-           <div className="flex flex-col">
-              <span className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Want deeper insights?</span>
-              <span className="text-xs text-blue-300">Ask the AI to uncover more</span>
+      {/* Refine Analysis Bar - High Fidelity Redesign */}
+      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 animate-in slide-in-from-bottom-10 fade-in duration-700 delay-1000 w-full max-w-[500px] px-4">
+        <div className={`
+          flex items-center justify-between p-2 pl-6 pr-2 rounded-full shadow-2xl backdrop-blur-xl border transition-all
+          ${isDarkMode ? 'bg-[#050505]/95 border-emerald-900/30' : 'bg-white/95 border-blue-200 shadow-blue-900/10'}
+        `}>
+           <div className="flex flex-col mr-4">
+              <span className={`text-sm font-black tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+                Want deeper insights?
+              </span>
+              <span className="text-[11px] font-medium bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
+                Ask the AI to uncover more
+              </span>
            </div>
-           <Button 
-            onClick={() => setShowRefineDialog(true)}
-            className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-full shadow-lg shadow-blue-500/20"
-            disabled={isRefining}
-          >
-             {isRefining ? <Activity className="animate-spin" size={16} /> : <Sparkles size={16} />}
-             {isRefining ? 'Refining...' : 'Refine Analysis'}
-          </Button>
+
+           <button 
+             onClick={() => setShowRefineDialog(true)}
+             className="group relative overflow-hidden rounded-full py-2.5 px-6 flex items-center gap-2 transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-emerald-900/20"
+           >
+              {/* Gradient Background */}
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-emerald-500 to-teal-400"></div>
+              
+              {/* Shine Effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+
+              {/* Content */}
+              <div className="relative flex items-center gap-2">
+                 <span className="font-serif italic font-black text-lg text-white leading-none mt-0.5">K</span>
+                 <span className="text-sm font-bold text-white tracking-wide">Refine Analysis</span>
+              </div>
+           </button>
         </div>
       </div>
 
