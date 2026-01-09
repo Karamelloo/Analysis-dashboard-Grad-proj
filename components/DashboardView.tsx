@@ -6,7 +6,8 @@ import {
   Methodology,
   DynamicAnalysisSection,
   InsightsSection,
-  RecommendationsSection
+  RecommendationsSection,
+  PredictionsSection
 } from '@/components/AnalysisSections';
 import { ScrollToTop } from '@/components/ScrollToTop';
 import { DashboardData } from '@/types/dashboard';
@@ -33,7 +34,7 @@ interface DashboardViewProps {
 
 export function DashboardView({ data, onReset, onRefine, isRefining, isSessionActive, onSessionRestore, showSuccess }: DashboardViewProps) {
   
-  const { keyMetrics, dynamicCharts, keyInsights, recommendations, recordCount, analysisTitle, analysisDescription } = data;
+  const { keyMetrics, dynamicCharts, keyInsights, recommendations, predictions, recordCount, analysisTitle, analysisDescription } = data;
   const dashboardRef = useRef<HTMLDivElement>(null);
   const [showRefineDialog, setShowRefineDialog] = useState(false);
   const isDarkMode = true; // Forced Dark Mode
@@ -58,16 +59,18 @@ export function DashboardView({ data, onReset, onRefine, isRefining, isSessionAc
 
   return (
 
-    <div className={`min-h-screen relative flex flex-col font-sans overflow-hidden transition-colors duration-500 ${isDarkMode ? 'bg-[#0b1121] text-white selection:bg-blue-500/30' : 'bg-slate-50 text-slate-900 selection:bg-blue-200/50'}`} ref={dashboardRef}>
+    <div className={`min-h-screen relative flex flex-col font-sans overflow-hidden transition-colors duration-500 ${isDarkMode ? 'bg-[#050505] text-white selection:bg-blue-500/30' : 'bg-slate-50 text-slate-900 selection:bg-blue-200/50'}`} ref={dashboardRef}>
       
-      {/* Professional Logistics Background */}
+      {/* Dynamic Aurora Background (Matching Hero) */}
       {isDarkMode ? (
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          {/* Subtle Grid for Data Feel */}
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f2937_1px,transparent_1px),linear-gradient(to_bottom,#1f2937_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-20"></div>
-          {/* Deep Blue Glows */}
-          <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-blue-900/20 to-transparent opacity-40"></div>
-          <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-indigo-900/10 rounded-full blur-[100px]"></div>
+        <div className="absolute inset-0 z-0 bg-[#050505]">
+           {/* Aurora Beams */}
+           <div className="absolute top-[-20%] left-[-10%] w-[800px] h-[600px] bg-emerald-900/10 rounded-full blur-[100px] animate-pulse"></div>
+           <div className="absolute top-[10%] right-[-10%] w-[600px] h-[600px] bg-blue-900/20 rounded-full blur-[120px] animate-blob animation-delay-4000"></div>
+           <div className="absolute bottom-[-20%] left-[20%] w-[800px] h-[500px] bg-slate-800/20 rounded-full blur-[100px] animate-blob animation-delay-2000"></div>
+           
+           {/* Subtle Grain Overlay */}
+           <div className="absolute inset-0 bg-[url('/noise.svg')] opacity-[0.05]"></div>
         </div>
       ) : (
          <div className="absolute inset-0 z-0 pointer-events-none">
@@ -161,16 +164,16 @@ export function DashboardView({ data, onReset, onRefine, isRefining, isSessionAc
 
       {/* Header */}
 
-      <div className={`sticky top-0 z-50 border-b px-6 py-4 flex justify-between items-center shadow-lg transition-colors duration-500 ${isDarkMode ? 'bg-[#0f172a]/90 border-blue-900/30 backdrop-blur-md' : 'bg-white/90 border-slate-200 backdrop-blur-md'}`} data-html2canvas-ignore>
+      <div className={`sticky top-0 z-50 border-b px-6 py-4 flex justify-between items-center shadow-lg transition-colors duration-500 ${isDarkMode ? 'bg-[#050505]/80 border-white/5 backdrop-blur-md' : 'bg-white/90 border-slate-200 backdrop-blur-md'}`} data-html2canvas-ignore>
         <div className="flex items-center gap-3">
            <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-blue-600' : 'bg-blue-600'} text-white`}>
              <BarChart3 className="w-5 h-5" />
            </div>
            <div>
              <h1 className={`text-lg font-bold leading-none ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
-               Shahad D Project
+               Karam A+ Project
              </h1>
-             <p className={`text-[10px] uppercase tracking-wider font-semibold ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>Logistics Intelligence</p>
+             <p className={`text-[10px] uppercase tracking-wider font-semibold ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>Analysis Dashboard</p>
            </div>
         </div>
         
@@ -200,7 +203,7 @@ export function DashboardView({ data, onReset, onRefine, isRefining, isSessionAc
         {/* Dynamic Hero Section */}
         <section className={`mb-12 text-center py-10 rounded-3xl relative overflow-hidden`}>
              {/* Decorative backing for hero */}
-             <div className={`absolute inset-0 opacity-10 ${isDarkMode ? 'bg-gradient-to-r from-blue-500 to-purple-600' : 'bg-gradient-to-r from-blue-600 to-indigo-600'}`}></div>
+             <div className={`absolute inset-0 opacity-10 ${isDarkMode ? 'bg-gradient-to-r from-blue-500 to-emerald-600' : 'bg-gradient-to-r from-blue-600 to-indigo-600'}`}></div>
              
             <h2 className={`text-3xl md:text-5xl font-bold mb-4 relative z-10 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{analysisTitle}</h2>
             <p className={`text-lg max-w-3xl mx-auto font-light leading-relaxed relative z-10 ${isDarkMode ? 'text-blue-100' : 'text-slate-600'}`}>{analysisDescription}</p>
@@ -243,6 +246,8 @@ export function DashboardView({ data, onReset, onRefine, isRefining, isSessionAc
         <DynamicAnalysisSection charts={dynamicCharts} isDarkMode={isDarkMode} />
 
         <RecommendationsSection recommendations={recommendations} isDarkMode={isDarkMode} />
+
+        <PredictionsSection predictions={predictions} isDarkMode={isDarkMode} />
         
         <PageFooter />
       </main>
@@ -250,28 +255,38 @@ export function DashboardView({ data, onReset, onRefine, isRefining, isSessionAc
       {/* Scroll To Top */}
       <ScrollToTop />
 
-      {/* Bottom Floating Command Bar (Refine) */}
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 animate-in slide-in-from-bottom-10 fade-in duration-700 delay-1000 w-full max-w-lg px-4">
-        <button 
-          onClick={() => setShowRefineDialog(true)}
-          className={`w-full group relative overflow-hidden backdrop-blur-xl border rounded-full p-1.5 pr-6 flex items-center gap-4 transition-all hover:scale-[1.02] shadow-2xl ${isDarkMode ? 'bg-[#0f172a]/80 border-blue-500/30 shadow-blue-900/20' : 'bg-white/90 border-blue-200 shadow-blue-900/5'}`}
-        >
-           {/* Animated Glow Border Effect */}
-           <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-transparent to-blue-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-           <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-600 text-white'}`}>
-              <Sparkles size={18} className="fill-current" />
-           </div>
-           
-           <div className="flex flex-col items-start mr-auto">
-              <span className={`text-sm font-bold tracking-wide ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>COMMAND AI ANALYST</span>
-              <span className={`text-[10px] ${isDarkMode ? 'text-blue-300' : 'text-slate-500'}`}>Click to request deeper logistics insights...</span>
+      {/* Refine Analysis Bar - High Fidelity Redesign */}
+      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 animate-in slide-in-from-bottom-10 fade-in duration-700 delay-1000 w-full max-w-[500px] px-4">
+        <div className={`
+          flex items-center justify-between p-2 pl-6 pr-2 rounded-full shadow-2xl backdrop-blur-xl border transition-all
+          ${isDarkMode ? 'bg-[#050505]/95 border-emerald-900/30' : 'bg-white/95 border-blue-200 shadow-blue-900/10'}
+        `}>
+           <div className="flex flex-col mr-4">
+              <span className={`text-sm font-black tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+                Want deeper insights?
+              </span>
+              <span className="text-[11px] font-medium bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
+                Ask the AI to uncover more
+              </span>
            </div>
 
-           <div className={`px-3 py-1 rounded text-xs font-bold uppercase tracking-wider ${isDarkMode ? 'bg-white/10 text-white group-hover:bg-white/20' : 'bg-slate-100 text-slate-700'}`}>
-              INITIATE
-           </div>
-        </button>
+           <button 
+             onClick={() => setShowRefineDialog(true)}
+             className="group relative overflow-hidden rounded-full py-2.5 px-6 flex items-center gap-2 transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-emerald-900/20"
+           >
+              {/* Gradient Background */}
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-emerald-500 to-teal-400"></div>
+              
+              {/* Shine Effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+
+              {/* Content */}
+              <div className="relative flex items-center gap-2">
+                 <span className="font-serif italic font-black text-lg text-white leading-none mt-0.5">K</span>
+                 <span className="text-sm font-bold text-white tracking-wide">Refine Analysis</span>
+              </div>
+           </button>
+        </div>
       </div>
 
     </div>

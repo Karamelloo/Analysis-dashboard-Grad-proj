@@ -6,6 +6,7 @@ import { SkeletonLoader } from '@/components/SkeletonLoader';
 import { DashboardView } from '@/components/DashboardView';
 import { DashboardData } from '@/types/dashboard';
 import { PageHeader, PageFooter } from '@/components/LayoutComponents';
+import { User, Building2, Zap, XCircle, CheckCircle2 } from 'lucide-react';
 
 export default function Home() {
   const [data, setData] = useState<DashboardData | null>(null);
@@ -230,12 +231,18 @@ export default function Home() {
   return (
     <div className="min-h-screen relative flex flex-col font-sans bg-black overflow-hidden selection:bg-blue-500/30">
       
-      {/* Dynamic Dark Background */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-900/40 rounded-full mix-blend-screen filter blur-[120px] opacity-50 animate-blob"></div>
-        <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-blue-900/40 rounded-full mix-blend-screen filter blur-[120px] opacity-50 animate-blob animation-delay-2000"></div>
-        <div className="absolute bottom-[-20%] left-[20%] w-[600px] h-[600px] bg-indigo-900/40 rounded-full mix-blend-screen filter blur-[120px] opacity-50 animate-blob animation-delay-4000"></div>
-        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.03] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
+      {/* Dynamic Aurora Background */}
+      <div className="absolute inset-0 z-0 bg-[#050505]">
+         {/* Aurora Beams */}
+         <div className="absolute top-[-20%] left-[-10%] w-[800px] h-[600px] bg-emerald-900/20 rounded-full blur-[100px] animate-pulse"></div>
+         <div className="absolute top-[10%] right-[-10%] w-[600px] h-[600px] bg-blue-900/30 rounded-full blur-[120px] animate-blob animation-delay-4000"></div>
+         <div className="absolute bottom-[-20%] left-[20%] w-[800px] h-[500px] bg-slate-800/20 rounded-full blur-[100px] animate-blob animation-delay-2000"></div>
+         
+         {/* Subtle Grain Overlay */}
+         <div className="absolute inset-0 bg-[url('/noise.svg')] opacity-[0.05]"></div>
+         
+         {/* Grid Pattern (Subtle) */}
+         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.02] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
       </div>
 
       {/* Content */}
@@ -253,24 +260,86 @@ export default function Home() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
                 </span>
-                Shahad D Graduation Project v1.0
+                Powered by AI
             </div>
 
             <h2 className="text-6xl md:text-8xl font-black text-white mb-8 bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-blue-200 tracking-tighter drop-shadow-2xl leading-none">
-              Smart Logistics<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Analytics</span>
+              <span className="text-[#F2C811] drop-shadow-md">Power BI?</span><br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">More like Power bye.</span>
             </h2>
             
-            <p className="text-xl md:text-2xl text-blue-100/70 mb-10 max-w-3xl mx-auto leading-relaxed tracking-tight font-light">
-              Detect delays, optimize routes, and audit carrier performance instantly.
-              Upload shipment data from <span className="text-white font-semibold">Aramex, FedEx, or DHL</span> to get actionable AI insights.
+            <p className="text-xl md:text-2xl text-slate-400 mb-10 max-w-3xl mx-auto leading-relaxed tracking-tight font-light">
+              Stop dragging and dropping. <strong>Power BI is dead.</strong>
+              Get instant, AI-powered intelligence without the headache.
             </p>
             
           </div>
           
+          {/* Value Props Grid - Moved to Top */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-6xl mb-12 px-4 animate-in fade-in slide-in-from-bottom-16 duration-1000 delay-300">
+               {/* User Benefit */}
+               <div className="bg-[#0c111c]/80 border border-white/5 p-8 rounded-3xl backdrop-blur-md hover:border-blue-500/30 transition-all group hover:-translate-y-1">
+                  <div className="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-500/20 transition-colors">
+                     <User className="text-blue-400" size={28} />
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-3">Instant Analyst</h3>
+                  <p className="text-sm text-slate-400 leading-relaxed font-light">
+                     Get advanced insights without writing a single formula. Upload your file and let the AI interpret hidden patterns specifically for you.
+                  </p>
+               </div>
+
+               {/* Business Benefit */}
+               <div className="bg-[#0c111c]/80 border border-white/5 p-8 rounded-3xl backdrop-blur-md hover:border-emerald-500/30 transition-all group hover:-translate-y-1">
+                  <div className="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-emerald-500/20 transition-colors">
+                     <Building2 className="text-emerald-400" size={28} />
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-3">Maximize ROI</h3>
+                  <p className="text-sm text-slate-400 leading-relaxed font-light">
+                     Cut manual reporting time by 90%. Turn raw operational data into strategic decisions instantly, reducing analytics overhead significantly.
+                  </p>
+               </div>
+
+               {/* Competitive Edge (vs Power BI) */}
+               <div className="bg-[#0c111c]/80 border border-white/5 p-8 rounded-3xl backdrop-blur-md hover:border-orange-500/30 transition-all group hover:-translate-y-1 relative overflow-hidden">
+                  <div className="absolute -top-10 -right-10 w-32 h-32 bg-orange-500/10 rounded-full blur-3xl group-hover:bg-orange-500/20 transition-colors"></div>
+                  
+                  <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                     <Zap className="text-orange-400" size={24} fill="currentColor" />
+                     Why not Power BI?
+                  </h3>
+                  
+                  <div className="space-y-3">
+                     <div className="flex items-center justify-between group/item">
+                        <span className="text-xs text-slate-500 font-medium">Power BI</span>
+                        <div className="flex items-center gap-2">
+                           <span className="text-xs text-red-400 line-through decoration-red-500/50">Manual</span>
+                           <XCircle size={14} className="text-red-500"/>
+                        </div>
+                     </div>
+                     <div className="flex items-center justify-between group/item">
+                        <span className="text-xs text-slate-500 font-medium">Power BI</span>
+                        <div className="flex items-center gap-2">
+                           <span className="text-xs text-red-400 line-through decoration-red-500/50">Static</span>
+                           <XCircle size={14} className="text-red-500"/>
+                        </div>
+                     </div>
+                     <div className="h-px bg-white/5 my-3"></div>
+                     <div className="flex items-center justify-between">
+                         <span className="text-sm text-emerald-400 font-bold">Karam A+</span>
+                         <div className="flex items-center gap-2">
+                            <span className="text-xs text-white">Auto-Generated</span>
+                            <CheckCircle2 size={16} className="text-emerald-500"/>
+                         </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+
           <div className="w-full max-w-2xl bg-white/5 backdrop-blur-2xl rounded-3xl p-2 border border-white/10 shadow-2xl shadow-blue-900/20 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-200">
              <FileUploader onUpload={handleUpload} isAnalyzing={isAnalyzing} />
           </div>
+
+
         </main>
         
         <PageFooter />

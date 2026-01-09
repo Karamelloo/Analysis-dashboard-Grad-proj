@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { Upload, FileSpreadsheet, CheckCircle, Loader2 } from 'lucide-react';
+import { Upload, FileText, CheckCircle, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // To save installing another dep, I'll allow simple input first, 
@@ -54,20 +54,17 @@ export function FileUploader({ onUpload, isAnalyzing }: FileUploaderProps) {
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-xl bg-[#0f172a]/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-blue-500/20 p-8 text-center relative overflow-hidden"
+        className="w-full max-w-xl bg-[#050505]/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-blue-500/20 p-8 text-center relative overflow-hidden"
       >
-        {/* Decorative Grid Background inside card */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:2rem_2rem] opacity-20 pointer-events-none"></div>
-        
         <div className="relative z-10">
           <div className="mb-6">
             <div className="w-16 h-16 bg-blue-500/10 text-blue-400 rounded-2xl border border-blue-500/20 flex items-center justify-center mx-auto mb-4 relative group">
               <div className="absolute inset-0 bg-blue-400/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity rounded-full"></div>
-              <FileSpreadsheet size={32} />
+              <FileText size={32} />
             </div>
-            <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">Upload Shipment Data</h2>
+            <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">Upload Analysis Data</h2>
             <p className="text-blue-200/60 font-light">
-              Supported formats: .xlsx, .csv (Aramex, FedEx, DHL)
+              Supported formats: .xlsx, .csv
             </p>
           </div>
 
@@ -126,14 +123,14 @@ export function FileUploader({ onUpload, isAnalyzing }: FileUploaderProps) {
           <div className="mt-6 space-y-4">
             <div className="text-left">
               <label className="text-xs font-semibold uppercase tracking-wider text-blue-300/80 mb-2 block pl-1">
-                Special Instructions (Optional)
+                AI Instructions
               </label>
               <input 
                 type="text" 
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
-                placeholder="e.g. Focus on Riyadh delays..."
-                className="w-full bg-[#1e293b]/50 border border-blue-500/20 rounded-xl px-4 py-3 text-white placeholder:text-blue-300/30 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all font-light"
+                placeholder="Enter your preferred Analysis"
+                className="w-full bg-[#0a0a0a]/50 border border-blue-500/20 rounded-xl px-4 py-3 text-white placeholder:text-blue-300/30 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all font-light"
               />
             </div>
 
