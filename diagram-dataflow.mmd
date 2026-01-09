@@ -1,0 +1,29 @@
+graph LR
+    %% Styling
+    classDef file fill:#f9f,stroke:#333,stroke-width:2px;
+    classDef process fill:#e1d5e7,stroke:#333,stroke-width:2px;
+    classDef data fill:#d5e8d4,stroke:#333,stroke-width:2px;
+
+    %% Nodes
+    Node1[Raw User File<br/>.csv / .xlsx]:::file
+    Node2[Binary Buffer]:::data
+    Node3[All Data JSON<br/>Full Dataset]:::data
+    Node4[Sampled Data<br/>Top 15 Rows]:::data
+    
+    subgraph PromptEngineering [Prompt Engineering Phase]
+        direction TB
+        Node5[Structured Prompt]:::data
+    end
+
+    Node6[Raw AI Response<br/>JSON String]:::data
+    Node7[Validated DashboardData<br/>Object]:::data
+    Node8[Visual Dashboard<br/>React UI]:::process
+
+    %% Connections
+    Node1 -->|Upload| Node2
+    Node2 -->|SheetJS Parse| Node3
+    Node3 -->|Slice 0-15| Node4
+    Node4 -->|Combine with Schema| Node5
+    Node5 -->|Groq API Call| Node6
+    Node6 -->|JSON.parse| Node7
+    Node7 -->|Render| Node8

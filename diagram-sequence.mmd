@@ -1,0 +1,39 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant UI as Dashboard UI (Client)
+    participant API as Next.js API (/api/analyze)
+    participant SheetJS as PDF/Excel Parser
+    participant LLM as Groq AI (Llama 3.3)
+
+    User->>UI: Uploads File (.csv / .xlsx)
+    activate UI
+    UI->>UI: Create FormData
+    UI->>API: POST /api/analyze (Multipart File)
+    activate API
+    
+    Note right of API: Bypasses 60s Timeout Warning<br/>(AbortController utilized)
+    
+    API->>SheetJS: Parse Buffer to JSON
+    activate SheetJS
+    SheetJS-->>API: Return Raw Data Array
+    deactivate SheetJS
+
+    API->>API: Slice Data (Top 15 Rows Sample)
+    API->>API: Construct System Prompt\n(Identity, Rules, Output Schema)
+
+    API->>LLM: Send Prompt + Data Sample
+    activate LLM
+    Note right of LLM: Inference (Llama 3.3-70b)
+    LLM-->>API: Return Generated JSON String
+    deactivate LLM
+
+    API->>API: JSON.parse() & Validation
+    API->>API: Inject Meta-data (Record Count)
+
+    API-->>UI: Return DashboardData (JSON)
+    deactivate API
+
+    UI->>UI: Update React State
+    UI->>User: Render Charts, Metrics, & Insights
+    deactivate UI

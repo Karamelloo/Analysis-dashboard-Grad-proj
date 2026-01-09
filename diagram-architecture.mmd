@@ -1,0 +1,27 @@
+graph TD
+    %% Styling
+    classDef user fill:#f9f,stroke:#333,stroke-width:2px;
+    classDef frontend fill:#d4f1f9,stroke:#333,stroke-width:2px;
+    classDef backend fill:#e1d5e7,stroke:#333,stroke-width:2px;
+    classDef ai fill:#d5e8d4,stroke:#333,stroke-width:2px;
+
+    %% Nodes
+    User((User)):::user
+    
+    subgraph "Playsonic Application (Next.js 16)"
+        Frontend[Frontend Client\n(React 19 / Tailwind / Recharts)]:::frontend
+        Backend[Backend API Route\n(/api/analyze - Node.js)]:::backend
+    end
+    
+    Groq[Groq AI Platform\n(Llama 3.3-70b-versatile)]:::ai
+
+    %% Connections
+    User -- "Uploads Data / Views Dashboard" --> Frontend
+    Frontend -- "HTTPS POST (FormData)" --> Backend
+    Backend -- "JSON Response" --> Frontend
+    Backend -- "SDK Request (Prompt + Data Sample)" --> Groq
+    Groq -- "Structured JSON Output" --> Backend
+
+    %% Descriptions
+    Frontend -. "State Management & Rendering" .- Frontend
+    Backend -. "Data Parsing (SheetJS)\nPrompt Engineering" .- Backend
