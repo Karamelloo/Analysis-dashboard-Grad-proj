@@ -3,6 +3,33 @@ import Groq from 'groq-sdk';
 import * as XLSX from 'xlsx';
 import { DashboardData } from '@/types/dashboard';
 
+// Helper function to remove duplicate rows
+function removeDuplicates(data: any[]): { cleanData: any[], duplicatesRemoved: number } {
+  if (!data || data.length === 0) {
+    return { cleanData: data, duplicatesRemoved: 0 };
+  }
+
+  const seen = new Set<string>();
+  const cleanData: any[] = [];
+
+  for (const row of data) {
+    // Create a unique key from all values in the row
+    const rowKey = JSON.stringify(
+      Object.keys(row)
+        .sort() // Sort keys to ensure consistent comparison
+        .map(key => row[key])
+    );
+
+    if (!seen.has(rowKey)) {
+      seen.add(rowKey);
+      cleanData.push(row);
+    }
+  }
+
+  const duplicatesRemoved = data.length - cleanData.length;
+  return { cleanData, duplicatesRemoved };
+}
+
 // Initialize Groq
 const apiKey = process.env.GROQ_API_KEY || process.env.GEMINI_API_KEY;
 const groq = new Groq({
@@ -31,7 +58,13 @@ export async function POST(req: NextRequest) {
     }
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
-    const allData = XLSX.utils.sheet_to_json(sheet);
+    const rawData = XLSX.utils.sheet_to_json(sheet);
+    
+    // Remove duplicates from the entire dataset
+    const { cleanData: allData, duplicatesRemoved } = removeDuplicates(rawData);
+    
+    // Log duplicate removal statistics
+    console.log(`Data cleaning: ${duplicatesRemoved} duplicate rows removed from ${rawData.length} total rows`);
     
     // Send a sample of data to the AI (ensure it's enough to infer context)
     // Reduce sample size to 15 to save tokens and avoid rate limits
@@ -150,6 +183,7 @@ export async function POST(req: NextRequest) {
 
       DATASET CONTEXT:
       - Total Records: ${allData.length}
+      - Duplicates Removed: ${duplicatesRemoved}
       - Columns/Keys: ${Object.keys(promptData[0] || {}).join(", ")} <--- ONLY USE THESE FIELDS.
       
       SAMPLE DATA (First 15 rows):
@@ -206,8 +240,9 @@ export async function POST(req: NextRequest) {
 
     try {
       dashboardData = JSON.parse(jsonString);
-      // Inject actual record count
+      // Inject actual record count and duplicates removed
       dashboardData.recordCount = allData.length;
+      dashboardData.duplicatesRemoved = duplicatesRemoved;
     } catch (parseError) {
       console.error('Failed to parse Groq response:', parseError);
       console.error('Raw response:', text);

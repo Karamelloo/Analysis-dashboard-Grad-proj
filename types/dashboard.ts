@@ -62,4 +62,5 @@ export interface DashboardData {
   }[];
   isNew?: boolean;
   recordCount?: number;
+  duplicatesRemoved?: number;
 }

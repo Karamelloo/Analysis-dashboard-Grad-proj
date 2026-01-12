@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { PageFooter } from '@/components/LayoutComponents';
 import { HeroSection } from '@/components/HeroSection';
 import { StatCard } from '@/components/StatCard';
+import { DataCleaningSummary } from '@/components/DataCleaningSummary';
 import { 
   Methodology,
   DynamicAnalysisSection,
@@ -34,7 +35,7 @@ interface DashboardViewProps {
 
 export function DashboardView({ data, onReset, onRefine, isRefining, isSessionActive, onSessionRestore, showSuccess }: DashboardViewProps) {
   
-  const { keyMetrics, dynamicCharts, keyInsights, recommendations, predictions, recordCount, analysisTitle, analysisDescription } = data;
+  const { keyMetrics, dynamicCharts, keyInsights, recommendations, predictions, recordCount, duplicatesRemoved, analysisTitle, analysisDescription } = data;
   const dashboardRef = useRef<HTMLDivElement>(null);
   const [showRefineDialog, setShowRefineDialog] = useState(false);
   const isDarkMode = true; // Forced Dark Mode
@@ -240,6 +241,8 @@ export function DashboardView({ data, onReset, onRefine, isRefining, isSessionAc
 
         {/* Dynamic & Generic Analysis Sections */}
         <Methodology recordCount={recordCount} isDarkMode={isDarkMode} />
+
+        <DataCleaningSummary duplicatesRemoved={duplicatesRemoved || 0} recordCount={recordCount || 0} isDarkMode={isDarkMode} />
 
         <InsightsSection insights={keyInsights} isDarkMode={isDarkMode} />
 
